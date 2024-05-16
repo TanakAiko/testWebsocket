@@ -15,8 +15,8 @@ function sendData() {
     }
 }
 
-const buttonOk = document.getElementById('submit');
-buttonOk.addEventListener("click", (event) => {
+const divSend = document.getElementById('submit');
+divSend.addEventListener("click", (event) => {
     event.preventDefault();
     sendData();
 });

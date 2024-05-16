@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"text/template"
 
 	"github.com/gorilla/websocket"
 )
@@ -34,33 +33,40 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	//defer ws.Close()
 
 	for {
-		// Lecture des données JSON envoyées par le client
 		var msg ScoreData
-		err := ws.ReadJSON(&msg)
+
+		messageType, p, err := ws.ReadMessage()
 		if err != nil {
-			log.Printf("Error reading JSON: %v", err)
-			println("aaaaaaaaaaaa ")
-			break
+			log.Printf("Error reading msg: %v", err)
+			println("aaaaaaaaaaaa => messageType : ", messageType)
+			continue
 		}
-		println("bbbbbbbbbbbbbbbbbb")
+
+		println("bbbbbbbbbbbbbbbbbb => messageType : ", messageType)
+		println("p ===> ", string(p))
+
+		err = json.Unmarshal(p, &msg)
+		if err != nil {
+			log.Printf("Error when Unmarshal data: %v", err)
+		}
 
 		// Validation des données reçues
 		if msg.Name == "" || msg.Score < 0 || msg.Time < 0 {
 			log.Println("Invalid data received : ", msg)
-			break
+			continue
 		}
 
 		// Écriture des données dans le fichier
 		if err := writeJSONToFile(msg); err != nil {
 			log.Printf("Error writing JSON to file: %v", err)
-			break
+			continue
 		}
 
 		fmt.Printf("Received: %+v\n", msg)
 	}
 }
 
-func home(w http.ResponseWriter, r *http.Request) {
+/* func home(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles("index.html")
 	if err != nil {
 		fmt.Println(err)
@@ -71,7 +77,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-}
+} */
 
 func writeJSONToFile(data ScoreData) error {
 	var scores []ScoreData
@@ -113,7 +119,7 @@ func writeJSONToFile(data ScoreData) error {
 
 func main() {
 	http.HandleFunc("/ws", handleConnections)
-	http.HandleFunc("/", home)
+	/* http.HandleFunc("/", home) */
 	fmt.Println("WebSocket server starting on port 8080...")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
