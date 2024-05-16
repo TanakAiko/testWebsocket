@@ -28,56 +28,46 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	// Mise à niveau de la connexion HTTP en WebSocket
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Fatalf("Failed to set up WebSocket upgrade: %v", err)
+		//log.Fatalf("Failed to set up WebSocket upgrade: %v", err)
+		fmt.Println(err)
+		return
 	}
-	//defer ws.Close()
+	defer ws.Close()
 
 	for {
-		var msg ScoreData
 
-		messageType, p, err := ws.ReadMessage()
+		messageType, data, err := ws.ReadMessage()
 		if err != nil {
-			log.Printf("Error reading msg: %v", err)
-			println("aaaaaaaaaaaa => messageType : ", messageType)
-			continue
+			fmt.Printf("Error reading msg: %v", err)
+			fmt.Println("aaaaaaaaaaaa => messageType : ", messageType)
+			return
 		}
 
-		println("bbbbbbbbbbbbbbbbbb => messageType : ", messageType)
-		println("p ===> ", string(p))
+		if ws.WriteMessage(messageType, data); err != nil {
+			fmt.Println(err)
+			return
+		}
 
-		err = json.Unmarshal(p, &msg)
+		var msg ScoreData
+
+		err = json.Unmarshal(data, &msg)
 		if err != nil {
-			log.Printf("Error when Unmarshal data: %v", err)
+			fmt.Printf("Error when Unmarshal data: %v", err)
+			return
 		}
 
 		// Validation des données reçues
 		if msg.Name == "" || msg.Score < 0 || msg.Time < 0 {
-			log.Println("Invalid data received : ", msg)
-			continue
+			fmt.Println("Invalid data received !")
+			return
 		}
 
-		// Écriture des données dans le fichier
 		if err := writeJSONToFile(msg); err != nil {
-			log.Printf("Error writing JSON to file: %v", err)
-			continue
+			fmt.Printf("Error writing JSON to file: %v", err)
+			return
 		}
-
-		fmt.Printf("Received: %+v\n", msg)
 	}
 }
-
-/* func home(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("index.html")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	err = tmpl.ExecuteTemplate(w, "index.html", nil)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-} */
 
 func writeJSONToFile(data ScoreData) error {
 	var scores []ScoreData
@@ -109,11 +99,11 @@ func writeJSONToFile(data ScoreData) error {
 
 	// Ecriture des données mises à jour dans le fichier
 	if err := os.WriteFile("score.json", content, 0644); err != nil {
-		log.Printf("Error writing JSON to file: %v", err)
+		fmt.Printf("Error writing JSON to file: %v", err)
 		return err
 	}
 
-	log.Println("Data successfully written to score.json")
+	fmt.Println("Data successfully written to score.json")
 	return nil
 }
 
