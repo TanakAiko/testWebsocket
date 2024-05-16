@@ -6,17 +6,29 @@
     <title>Websocket Client</title>
 </head>
 <body>
-    <h1>WebSocket Communication</h1>
-
-    <input type="text" id="playerName" name="name" placeholder="Name" required>
-    <input type="text" id="playerScore" name="score" placeholder="Score" required>
-    <input type="text" id="playerTime" name="time" placeholder="Time" required>
-
+    <input type="text" id="messageInput" placeholder="Enter a message">
     <button onclick="sendMessage()">Send Message</button>
     <div id="output"></div>
 
-    <script src="web.js">
-        import { sendMessage } from "web.js";
+    <script>
+        const socket = new WebSocket("ws://localhost:8080/ws")
+
+        socket.onopen = (event) => {
+            console.log("WebSocket connection opened");
+        }
+
+        socket.onmessage = (event) => {
+            const output = document.getElementById('output');
+            output.innerHTML += `<p>Received: ${event.data}</p>`;
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            socket.send(message);
+            messageInput.value = "";
+        }
+
     </script>
 </body>
 </html>
