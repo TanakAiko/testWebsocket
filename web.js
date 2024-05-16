@@ -10,14 +10,21 @@ socket.onmessage = (event) => {
 }
 
 function sendMessage() {
-    const name = document.getElementById("playerName");
-    const score = document.getElementById("playerScore");
-    const time = document.getElementById("playerTime");
+    //const messageInput = document.getElementById("messageInput");
+    const nameInput = document.getElementById("playerName");
+    const scoreInput = document.getElementById("playerScore");
+    const timeInput = document.getElementById("playerTime");
 
-    const message = JSON.stringify({ name: name.value, score: +score.value, time: +time.value })
-    socket.send(message);
-    
-    name.value = "";
-    score.value = "";
-    time.value = "";
+    //const message = messageInput.value;
+    /* const name = nameInput.value;
+    const score = scoreInput.value;
+    const time = timeInput.value; */
+
+    const messageToSend = JSON.stringify({ name: nameInput.value, score: +scoreInput.value, time: +timeInput.value })
+    socket.send(messageToSend);
+
+    //messageInput.value = "";
+    nameInput.value = "";
+    scoreInput.value = "";
+    timeInput.value = "";
 }
