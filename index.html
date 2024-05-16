@@ -7,6 +7,10 @@
 </head>
 <body>
     <input type="text" id="messageInput" placeholder="Enter a message">
+    <!-- <input type="text" id="playerName" name="name" placeholder="Name">
+    <input type="text" id="playerScore" name="score" placeholder="Score">
+    <input type="text" id="playerTime" name="time" placeholder="Time"> -->
+
     <button onclick="sendMessage()">Send Message</button>
     <div id="output"></div>
 
@@ -24,9 +28,22 @@
 
         function sendMessage() {
             const messageInput = document.getElementById("messageInput");
+            /* const nameInput = document.getElementById("playerName");
+            const scoreInput = document.getElementById("playerScore");
+            const timeInput = document.getElementById("playerTime"); */
+
             const message = messageInput.value;
+            /* const name = nameInput.value;
+            const score = scoreInput.value;
+            const time = timeInput.value; */
+
+            //const messageToSend = JSON.stringify({ name: name.value, score: +score.value, time: +time.value })
             socket.send(message);
+
             messageInput.value = "";
+            /* nameInput.value = "";
+            scoreInput.value = "";
+            timeInput.value = ""; */
         }
 
     </script>
