@@ -8,12 +8,35 @@
 </head>
 
 <body>
-    <!-- <input type="text" id="messageInput" placeholder="Enter a message"> -->
     <input type="text" id="playerName" name="name" placeholder="Name">
     <input type="text" id="playerScore" name="score" placeholder="Score">
     <input type="text" id="playerTime" name="time" placeholder="Time">
 
-    <script src="web.js"></script>
+    <script>
+        const socket = new WebSocket("ws://localhost:8080/ws")
+
+        socket.onopen = (event) => {
+            console.log("WebSocket connection opened");
+        }
+
+        socket.onmessage = (event) => {
+            const output = document.getElementById('output');
+            output.innerHTML += `<p>Received: ${event.data}</p>`;
+        }
+
+        function sendMessage() {
+            const nameInput = document.getElementById("playerName");
+            const scoreInput = document.getElementById("playerScore");
+            const timeInput = document.getElementById("playerTime");
+
+            const messageToSend = JSON.stringify({ name: nameInput.value, score: +scoreInput.value, time: +timeInput.value })
+            socket.send(messageToSend);
+
+            nameInput.value = "";
+            scoreInput.value = "";
+            timeInput.value = "";
+        }
+    </script>
 
     <button onclick="sendMessage()">Send Message</button>
     <div id="output"></div>
